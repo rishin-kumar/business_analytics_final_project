@@ -1,0 +1,327 @@
+%% =====================================================================
+%%  Prague Cafe Project -- Batch 1 report (built from the supplied template)
+%%  Every number in the text comes from tables/numbers.tex, which
+%%  analysis/03_tests.R writes, so the text and the scripts cannot drift apart.
+%%  Red [TODO ...] notes mark the few things only YOU can fill in.
+%% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage{cafestyle}
+
+\newcommand{\inputtable}[1]{\IfFileExists{#1}{\input{#1}}{\par\noindent\fbox{\parbox{0.9\linewidth}{\centering Missing table file: \texttt{\detokenize{#1}}}}\par}}
+\newcommand{\inputfigure}[2][0.85]{\IfFileExists{#2}{\includegraphics[width=#1\linewidth]{#2}}{\fbox{\parbox{0.8\linewidth}{\centering Missing figure file: \texttt{\detokenize{#2}}}}}}
+\newcommand{\widetable}[1]{\resizebox{\linewidth}{!}{\inputtable{#1}}}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+% all numbers quoted in the text (written by analysis/03_tests.R)
+\IfFileExists{tables/numbers.tex}{\input{tables/numbers.tex}}{\PackageWarning{cafe}{numbers.tex missing: run 03_tests.R}}
+
+\title{\textbf{Do Prague cappuccinos get cheaper away from the centre? Price, distance and caf\'e type in 200 caf\'es}}
+\author{Rishin Kumar\\[0.3ex]\small Data Analytics, Batch \textit{1}\\[0.3ex]\small Partner: \todo{name of the other student in Batch 1}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent I study the price of a dine-in cappuccino (in CZK) in \Nall{} Prague caf\'es collected by the class, and ask how it relates to the distance from the Orloj, location in Prague~1, district and caf\'e type, in ten pre-specified analyses. In this sample the price falls with distance: Pearson $r = \AsixR$, \CI{\AsixRLo}{\AsixRHi} (one-tailed \AsixP), about \AsevenB{} CZK per kilometre, but the robust interval for the slope just reaches zero. Prague~1 caf\'es are dearer by \AtwoDiff{} CZK on average (\AtwoP) and local chains by \AeightLocal{} CZK over independents, while differences between districts are unclear. The distance slope does not clearly differ between independents and chains.
+\end{abstract}
+
+\section{Introduction}
+Rents and tourist traffic are highest in the historic centre of Prague, so one might expect a cappuccino to cost more near the Old Town Square than in the outer districts, and chains and independents may price differently. This report asks whether the cappuccino price is related to the distance from the Orloj (the astronomical clock), to being in Prague~1, to the district, and to the caf\'e type. The ten questions are, in plain words: whether the average price differs from my own prior guess (A1); whether Prague~1 is dearer than the rest of Prague (A2); how much more a cappuccino costs than an espresso in the same caf\'e (A3); whether prices differ across six districts (A4); whether caf\'e type is related to being in Prague~1 (A5); whether price falls with distance (A6), by how many percent per kilometre (A7), and whether that survives once caf\'e type is in the model (A8); whether the distance slope differs between independents and chains (A9); and by how many percentage points the chance of an above-median price changes per kilometre (A10).
+
+\section{Data and methods}
+
+\subsection{Data}
+The data were collected by the class: ten students each visited 20 caf\'es in Prague and recorded dine-in prices, location and caf\'e details; the distance from the Orloj (km) is given in the file and calculated there from the coordinates. The raw file has \Nraw{} rows, of which \Nfilled{} contain a caf\'e. My cleaning script (\texttt{01\_cleaning.R}) reads the raw file, which is never edited by hand, and applies every step in code (Table~\ref{tab:clean}). It drops the \ClnEmpty{} empty rows, harmonises the district labels (\ClnDistrict{} labels changed, e.g.\ ``prague 1'' and ``prauge 1''), sets the one blank caf\'e type to missing, and removes the thousands separator from the number of ratings (\ClnSep{} cells; this variable is not used in Batch~1). \ClnCap{} cappuccino cells (and \ClnEsp{} espresso cells) list several prices, such as ``85, 95, 105'' or ``65/40''; I keep the first listed price, which is the dine-in or smallest size, and check in Appendix~\ref{app:robust} that this does not drive the results. One caf\'e (Republica Coffee) was recorded by two students and is kept once, leaving \Nall{} caf\'es. The file includes the lecturer's own entry (Srnky), which is a real caf\'e and is kept; its note says it serves only oat milk, so I check the results without it. No caf\'e is missing a cappuccino price, an espresso price, a distance or a district; the caf\'e type is missing for one caf\'e, so A5 and A8--A10 use \Ntype{} caf\'es. District comparisons use the six districts with at least twelve caf\'es (Prague 1, 2, 3, 5, 7 and 8; $n = \AfourN$). The only variable I transform is the price in A7, where I use $\log(\text{price})$; seats and ratings are not used in this batch.
+
+The cappuccino price has mean \PriceMean{} CZK, SD \PriceSD{}, median \PriceMedian{}, IQR \PriceIQR{} and range \PriceMin--\PriceMax{} CZK; the median distance from the Orloj is \DistMedian{} km (maximum \DistMax{} km). Full descriptive statistics are in Appendix~\ref{app:desc} (Table~\ref{tab:desc}).
+
+\begin{table}[ht]
+\centering\small
+\caption{Cleaning decisions applied by \texttt{01\_cleaning.R}, with the number of caf\'es (or rows) affected by each.}
+\label{tab:clean}
+\inputtable{tables/cleaning_log.tex}
+\end{table}
+
+\subsection{Statistical methods}
+The significance level is $\alpha = .05$ throughout. Hypotheses and their direction were fixed before any test was run: A2, A3 and A6 are one-tailed (the centre is expected to be dearer, the cappuccino dearer than the espresso), all others are two-tailed. For a one-tailed alternative I show the two-sided confidence interval and state that the $p$-value is one-tailed. Every figure was drawn before the corresponding test (Appendix~\ref{app:dist}). The plots show that the cappuccino price is mildly right-skewed (skewness \PriceSkew{}) with values clustered at multiples of five crowns, the distance is strongly right-skewed (\DistSkew{}), and the espresso-to-cappuccino differences are right-skewed (\DiffSkew{}). Because the groups compared are mostly large, I treat the $t$-based or Welch procedure as primary for comparisons of means and the rank-based procedure as the check, and I say below where they disagree; for A5 the smallest expected count is below five, so Fisher's exact test is primary; for A6 Pearson's $r$ is the headline and the rank coefficients check that the few distant caf\'es do not drive it. Confidence intervals for effect sizes use the normal approximation of Hedges and Olkin (Cohen's $d$ with the pooled SD, $d_z$ for paired data; every group has at least twenty observations, so Hedges' $g$ is not needed), the non-central $F$ distribution for $\eta^2$, and bootstrap percentile intervals for rank-biserial $r$, Cram\'er's $V$, $\varepsilon^2$, Spearman's $\rho$ and Kendall's $\tau$; the mean in A1 also has a BCa interval. All bootstraps use 5{,}000 resamples and seed 2026. Regression tables use HC3 robust standard errors; nested comparisons use the classical $F$-test; the logistic regression reports the average marginal effect by the delta method. Post hoc comparisons in A4 use Games--Howell (whose $p$-values are already adjusted for the family of pairs) and Dunn's test with Holm's adjustment. The report contains \Ntests{} tests in total, counting the alternative-method and robustness tests in the appendices; the ten primary tests are those in Table~\ref{tab:summary}. Software: R 4.3.3 with ggplot2, sandwich, lmtest, car, boot and xtable \todo{replace with the R and package versions on your own computer}.
+
+\section{Results}
+Table~\ref{tab:summary} summarises the ten analyses. Each subsection below gives the question, the hypotheses, the key figure, the estimate with its confidence interval, the effect size, the test, and one sentence of interpretation; the full tables, alternative tests and checks are in the appendices.
+
+\begin{table}[ht]
+\centering\small
+\caption{Main results of the ten analyses. The estimate is in the unit of each question (CZK, percent or percentage points); $d$ is Cohen's $d$ (or $d_z$), $V$ Cram\'er's $V$, $\eta^2$ the proportion of variance explained, OR the odds ratio.}
+\label{tab:summary}
+\widetable{tables/summary.tex}
+\end{table}
+
+\subsection{A1: One-sample test}
+\textit{Question.} Is the average cappuccino price in Prague different from my own prior guess? \Ho: $\mu = \AoneBench$ CZK; \Hone: $\mu \neq \AoneBench$ CZK (two-tailed). \todo{write down your own prior guess and where it came from. The scripts use \AoneBench{} CZK as a placeholder: set \texttt{BENCHMARK} in \texttt{03\_tests.R} and rerun. The brief asks for the guess to be fixed before you open the data, so be honest about when you chose it.}
+
+The sample mean is \meanci{\AoneMean}{\AoneLo}{\AoneHi}{CZK}, $n = \AoneN$ (Figure~\ref{fig:A1}), which is \AoneDiffAbs{} CZK (\AonePctRel\%) \AoneDir{} the benchmark. The standardised difference is $d = \AoneD$, \CI{\AoneDLo}{\AoneDHi}, with \tstat{\AoneDf}{\AoneT}, \AoneP. The Wilcoxon signed-rank test (pseudo-median \AoneWmed{} CZK, \AoneWP) and the BCa bootstrap interval [\AoneBLo, \AoneBHi] agree with the $t$-test, which I treat as primary because the price is only mildly skewed and $n$ is large. In money terms the gap is small relative to the spread of prices (SD \PriceSD{} CZK).
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.78]{figures/A1_figure.pdf}
+\caption{Distribution of the cappuccino price (CZK, bars of 5 CZK; $n = \AoneN$ caf\'es). The solid line is the sample mean, the grey band its 95\% confidence interval, and the dashed line the benchmark.}
+\label{fig:A1}
+\end{figure}
+
+\subsection{A2: Two groups}
+\textit{Question.} Is a cappuccino dearer in Prague~1 than in the rest of Prague? \Ho: mean prices are equal; \Hone: the mean in Prague~1 is higher (one-tailed).
+
+The mean difference, Prague~1 minus the rest of Prague, is \diffci{\AtwoDiff}{\AtwoLo}{\AtwoHi}{CZK}{\AtwoD}{\AtwoDLo}{\AtwoDHi} (means \AtwoMa{} CZK, $n = \AtwoNa$, and \AtwoMb{} CZK, $n = \AtwoNb$; Figure~\ref{fig:A2}), with Welch \tstat{\AtwoDf}{\AtwoT}, one-tailed \AtwoP. The Wilcoxon rank-sum test points the same way but is weaker (one-tailed \AtwoWP; Hodges--Lehmann shift \AtwoHL{} CZK, \CI{\AtwoHLLo}{\AtwoHLHi}; rank-biserial $r = \AtwoRB$, \CI{\AtwoRBLo}{\AtwoRBHi}). I treat the Welch test as primary because the question concerns the average price and both groups are large, but the two tests do not fully agree: the typical Prague~1 caf\'e seems to charge about \AtwoHL{} CZK more, and part of the gap in means comes from a few very dear caf\'es (price skewness in Prague~1 is 0.78). Whether a gap of this size matters to a customer is doubtful: it is under 10\% of the average price.
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.72]{figures/A2_figure.pdf}
+\caption{Cappuccino price (CZK) in Prague~1 ($n = \AtwoNa$) and the rest of Prague ($n = \AtwoNb$). Light points are individual caf\'es; dark points with error bars are group means with 95\% confidence intervals.}
+\label{fig:A2}
+\end{figure}
+
+\subsection{A3: Paired comparison}
+\textit{Question.} How much more does a cappuccino cost than an espresso in the same caf\'e? \Ho: the mean within-caf\'e difference is zero; \Hone: the cappuccino is dearer (one-tailed).
+
+Across $n = \AthreeN$ caf\'es the cappuccino costs \meanci{\AthreeM}{\AthreeLo}{\AthreeHi}{CZK} more than the espresso (Figure~\ref{fig:A3}), $d_z = \AthreeDz$, \CI{\AthreeDzLo}{\AthreeDzHi}, \tstat{\AthreeDf}{\AthreeT}, one-tailed \AthreeP. The Wilcoxon signed-rank test gives the same answer (\AthreeWP; Hodges--Lehmann shift \AthreeHL{} CZK, \CI{\AthreeHLLo}{\AthreeHLHi}). I treat the paired $t$-test as primary; the differences are right-skewed (\DiffSkew) and pile up at multiples of five, but the sample is large and both tests agree. A cappuccino costs about \AthreePctEsp\% more than an espresso (mean espresso price \EspMean{} CZK), which is a clear and noticeable markup.
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.78]{figures/A3_figure.pdf}
+\caption{Within-caf\'e difference between the cappuccino and espresso price (CZK; $n = \AthreeN$ caf\'es). The solid line is the mean difference, the grey band its 95\% confidence interval, and the dashed line marks zero.}
+\label{fig:A3}
+\end{figure}
+
+\subsection{A4: Several groups}
+\textit{Question.} Do cappuccino prices differ across Prague 1, 2, 3, 5, 7 and 8? \Ho: all district means are equal; \Hone: at least one differs.
+
+Welch's ANOVA gives \Fstat{\AfourDfa}{\AfourDfb}{\AfourF}, \AfourP, with $\eta^2 = \AfourEta$, \CI{\AfourEtaLo}{\AfourEtaHi} ($n = \AfourN$); the Kruskal--Wallis test gives $H(\AfourKWdf) = \AfourH$, \AfourKWP, $\varepsilon^2 = \AfourEps$. District means range from \AfourMinM{} CZK (\AfourMin) to \AfourMaxM{} CZK (\AfourMax; Figure~\ref{fig:A4}). Neither test reaches $\alpha = .05$ and they agree. Welch's ANOVA is primary because the groups differ in size (12 to 67) and spread. After adjustment no pair of districts differs (\AfourNsigGH{} of 15 pairs by Games--Howell, \AfourNsigDunn{} of 15 by Dunn with Holm); the largest gap is \AfourBestPair{}, \AfourBestDiff{} CZK, \CI{\AfourBestLo}{\AfourBestHi}, adjusted \AfourBestP. In this sample there is no clear evidence that prices differ by district, but the interval of the largest gap still allows differences of up to about 17 CZK.
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.85]{figures/A4_figure.pdf}
+\caption{Cappuccino price (CZK) by district for the six districts with at least twelve caf\'es. Light points are caf\'es; dark points with error bars are district means with 95\% confidence intervals; the dashed line is the mean of these six districts.}
+\label{fig:A4}
+\end{figure}
+
+\subsection{A5: Association of two categorical variables}
+\textit{Question.} Is caf\'e type (independent, local chain, international chain) related to being in Prague~1? \Ho: type and location are independent; \Hone: they are associated.
+
+The share of caf\'es located in Prague~1 is \AfiveShareInd\% for independents, \AfiveShareLoc\% for local chains and \AfiveShareInt\% for international chains (\AfiveKInt{} of \AfiveNInt; Figure~\ref{fig:A5}). The smallest expected count is \AfiveMinExp{}, below five, so Fisher's exact test is primary: \AfiveFisherP{} ($N = \AfiveN$); the chi-square test gives \chisqstat{\AfiveDf}{\AfiveN}{\AfiveChi}, \AfiveP. Cram\'er's $V = \AfiveV$, \CI{\AfiveVLo}{\AfiveVHi}. The standardised residual of international chains in Prague~1 is \AfiveResInt{} (all others are within $\pm 2$), so the association, if there is one, comes from the eleven international chains. In this sample the evidence is suggestive but not conclusive at $\alpha = .05$.
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.72]{figures/A5_figure.pdf}
+\caption{Share of caf\'es located in Prague~1 by caf\'e type ($N = \AfiveN$). Error bars are 95\% Wilson confidence intervals; the numbers at the base of the bars are the group sizes.}
+\label{fig:A5}
+\end{figure}
+
+\subsection{A6: Correlation}
+\textit{Question.} Does the price fall with the distance from the Orloj? \Ho: $\rho = 0$; \Hone: $\rho < 0$ (one-tailed, because the centre is expected to be dearer).
+
+The scatterplot (Figure~\ref{fig:A6}) shows a weak downward trend. Pearson's $r = \AsixR$, \CI{\AsixRLo}{\AsixRHi}, $n = \AsixN$, \tstat{\AsixDf}{\AsixT}, one-tailed \AsixP; the squared coefficient says that distance shares \AsixRsq\% of the variance of the price. The rank coefficients agree: Spearman's $\rho = \AsixRho$, bootstrap \CI{\AsixRhoLo}{\AsixRhoHi}, \AsixRhoP; Kendall's $\tau = \AsixTau$, \CI{\AsixTauLo}{\AsixTauHi}, \AsixTauP. I report Pearson's $r$ as the headline and the rank coefficients as the check that the few distant caf\'es do not drive it. In this sample caf\'es farther from the Orloj tend to be somewhat cheaper, but distance accounts for very little of the variation in price. This describes an association only.
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.8]{figures/A6_figure.pdf}
+\caption{Cappuccino price (CZK) against the distance from the Orloj (km), $n = \AsixN$ caf\'es. The solid line is the linear fit with its 95\% confidence band; the dashed line is a loess smoother.}
+\label{fig:A6}
+\end{figure}
+
+\subsection{A7: Simple regression}
+\textit{Question.} By what percentage does the price change with each kilometre from the Orloj, and is the relationship better described in crowns per kilometre? \Ho: the slope is zero; \Hone: the slope is not zero (two-tailed).
+
+In the log-linear model each additional kilometre goes with a price change of \AsevenPct\% (100$(e^{b}-1)$), robust \CI{\AsevenPctLo}{\AsevenPctHi}, \tstat{\AsevenDf}{\AsevenLogT}, \AsevenLogP; $R^2 = \AsevenLogRsq$ (Figure~\ref{fig:A7}). In crowns the slope is $\AsevenB$ CZK per km, robust \CI{\AsevenLo}{\AsevenHi}, \AsevenP, $R^2 = \AsevenRsq$ (Table~\ref{tab:A7}). The residual plots (Appendix~\ref{app:diag}) look alike for the two models; the residuals of the CZK model are slightly right-skewed (skewness \AsevenSkewLin) and those of the log model slightly left-skewed (\AsevenSkewLog), so neither is clearly better, and I use the log-linear model because the question asks for a percentage. Both describe the same thing: about 2\% (roughly 2 CZK) per kilometre, with an interval that just reaches zero. This is a two-tailed test with robust standard errors, which is why it is less conclusive than the one-tailed A6. The \AsevenNinfl{} caf\'es with Cook's $D > 4/n$ matter: without them the slope is \AsevenBinfl{} CZK per km (Appendix~\ref{app:robust}). The data show an association only; distance cannot be separated from rents, tourist traffic, caf\'e type or the student who collected the caf\'e, so they cannot say why price falls with distance.
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.8]{figures/A7_figure.pdf}
+\caption{Simple regression of the cappuccino price on distance ($n = \AsevenN$). Solid line: linear fit with its HC3 robust 95\% confidence band; dashed line: the log-linear fit back-transformed to crowns.}
+\label{fig:A7}
+\end{figure}
+
+\subsection{A8: Multiple regression}
+\textit{Question.} Does the distance slope survive once caf\'e type is in the model? \Ho: caf\'e type adds nothing; \Hone: caf\'e type improves the model.
+
+On the \AeightN{} caf\'es with a known type, the distance slope is \AeightBa{} CZK per km without type and \AeightBb{} CZK per km with type, robust \CI{\AeightBbLo}{\AeightBbHi} (Table~\ref{tab:reg}, Figure~\ref{fig:A8}): it changes by only \AeightChange{} CZK per km (\AeightRelChange\% of its size). Caf\'e type does improve the model: \Fstat{\AeightDfa}{\AeightDfb}{\AeightF}, \AeightP, $\Delta R^2 = \AeightDeltaR$ ($R^2$ from \AeightRsqA{} to \AeightRsqB). Local chains charge \AeightLocal{} CZK more than independents at the same distance, robust \CI{\AeightLocalLo}{\AeightLocalHi}; international chains charge \AeightInt{} CZK more, but with a very wide interval (\AeightIntLo{} to \AeightIntHi) because there are only eleven. The variance inflation factors are close to one (\AeightVifDist{} for distance, \AeightVifType{} for type), so the two predictors carry separate information. So the distance slope survives caf\'e type, but it stays small and its interval still reaches zero.
+
+\begin{table}[ht]
+\centering\small
+\caption{Regression of the cappuccino price (CZK) on distance (Model~1) and on distance and caf\'e type (Model~2). HC3 robust standard errors are in parentheses and 95\% confidence intervals in brackets; the reference type is independent. The same \AeightN{} caf\'es are used in both models.}
+\label{tab:reg}
+\inputtable{tables/A8_table.tex}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.8]{figures/A8_figure.pdf}
+\caption{Cappuccino price (CZK) against distance by caf\'e type ($n = \AeightN$). Lines are the fitted values of Model~2 (parallel lines, one per type) with the distance slope and its robust 95\% confidence interval in the subtitle.}
+\label{fig:A8}
+\end{figure}
+
+\subsection{A9: Interaction}
+\textit{Question.} Does the price fall with distance in the same way for independent caf\'es and for chains (local and international together)? \Ho: the interaction coefficient is zero, so the distance slope is the same in both groups; \Hone: it is not zero.
+
+The distance slope is \AnineSlopeInd{} CZK per km for independents (\CI{\AnineSlopeIndLo}{\AnineSlopeIndHi}, $n = \AnineNind$) and \AnineSlopeCh{} CZK per km for chains (\CI{\AnineSlopeChLo}{\AnineSlopeChHi}, $n = \AnineNch$; Figure~\ref{fig:A9}). The interaction coefficient is \AnineInt{} CZK per km, robust \CI{\AnineIntLo}{\AnineIntHi}; the nested test against the model without the interaction gives \Fstat{\AnineDfa}{\AnineDfb}{\AnineF}, \AnineP, $\Delta R^2 = \AnineDeltaR$ (Table~\ref{tab:inter}). There is no clear evidence that the slopes differ, but this is not evidence that they are equal: the interval still allows the chain slope to differ from the independent slope by about \AnineMaxDiff{} CZK per km in either direction, which is larger than the slope itself.
+
+\begin{table}[ht]
+\centering\small
+\caption{Regression of the cappuccino price (CZK) on distance and a chain indicator (local and international chains together; reference: independent), without and with their interaction. HC3 robust standard errors in parentheses, 95\% confidence intervals in brackets; $n = \AnineN$.}
+\label{tab:inter}
+\inputtable{tables/A9_table.tex}
+\end{table}
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.8]{figures/A9_figure.pdf}
+\caption{Cappuccino price (CZK) against distance for independent caf\'es ($n = \AnineNind$) and chains ($n = \AnineNch$). Lines are the fitted values of the model with interaction; bands are HC3 robust 95\% confidence intervals.}
+\label{fig:A9}
+\end{figure}
+
+\subsection{A10: Logistic regression}
+\textit{Question.} By how many percentage points does the probability that a cappuccino costs more than the median price change with each kilometre from the Orloj? \Ho: the distance coefficient is zero; \Hone: it is not zero. The outcome is 1 if the price exceeds 83~CZK, the median stated in the brief (the median in my cleaned sample is \AtenSampleMedian{} CZK); this applies to \AtenEvents{} of \AtenN{} caf\'es (\AtenShareHigh\%).
+
+In a logit model of this indicator on distance and caf\'e type, each additional kilometre changes the probability by an average marginal effect of \AtenAME{} percentage points, \CI{\AtenAMELo}{\AtenAMEHi}, other things equal (Figure~\ref{fig:A10}). The odds ratio per kilometre is \AtenOR, \CI{\AtenORLo}{\AtenORHi}; the Wald test of the distance coefficient gives $z = \AtenZ$, \AtenP. McFadden's pseudo-$R^2$ is \AtenMcF{}. The direction matches A6 and A7 (farther caf\'es are less likely to be above the median price), but the interval includes zero, so the sample is also compatible with no change.
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.78]{figures/A10_figure.pdf}
+\caption{Predicted probability that the cappuccino costs more than 83~CZK against the distance from the Orloj (km), for an independent caf\'e, with a 95\% confidence band; $n = \AtenN$ caf\'es. Dots are the observed outcomes (0 or 1, jittered).}
+\label{fig:A10}
+\end{figure}
+
+\section{Discussion}
+Taken together, the ten analyses give a consistent but modest picture for this sample. Cappuccino prices tend to fall with distance from the Orloj, by roughly two crowns or two percent per kilometre, but distance explains under three percent of the variation, and with robust standard errors and two-tailed tests the interval for the slope reaches zero (A6, A7, A8, A10). Caf\'e type is the clearer predictor: chains charge more than independents at the same distance (A8), and the distance slope does not clearly differ between the two kinds of caf\'e (A9). Prague~1 is probably somewhat dearer than the rest of Prague, but the two tests of that disagree on significance (A2), and I found no clear differences between districts (A4). A cappuccino costs about \AthreePctEsp\% more than an espresso in the same caf\'e (A3). The robustness checks and the post hoc comparisons in the appendices are exploratory; the ten primary analyses were planned, and I do not treat a single borderline $p$-value among \Ntests{} tests as a finding.
+
+Three limits matter. First, the sample is a convenience sample collected by ten students and not a random sample of Prague caf\'es, so I write ``in this sample'' throughout. Second, the data are observational, so distance, location and type are associated with price but are not causes of it. Third, caf\'es in the same district are not independent of each other, and neither are the 20 caf\'es recorded by the same student; the standard errors do not account for this and may be too small. Smaller limits are the first-price rule for cells with several prices, which I checked, and the fact that one caf\'e has no type.
+
+\appendix
+
+\section{Descriptive statistics}\label{app:desc}
+\begin{table}[ht]
+\centering\small
+\caption{Descriptive statistics of the numeric variables used. The mean is shown with its 95\% confidence interval; Skew is the sample skewness; the last row is the within-caf\'e difference used in A3.}
+\label{tab:desc}
+\widetable{tables/descriptives.tex}
+\end{table}
+
+\begin{table}[ht]
+\centering\small
+\caption{Counts and percentages of the categorical variables used ($N = \Nall$ caf\'es; percentages of all caf\'es).}
+\label{tab:desccat}
+\inputtable{tables/descriptives_cat.tex}
+\end{table}
+
+\begin{table}[ht]
+\centering\small
+\caption{Cappuccino price (CZK) by group: $n$, mean with 95\% confidence interval, SD, median, IQR and skewness.}
+\label{tab:descgrp}
+\widetable{tables/descriptives_groups.tex}
+\end{table}
+
+\section{Distributions and normality}\label{app:dist}
+The plots below were drawn before the tests. The price is mildly right-skewed with clusters at multiples of five crowns; the distance is strongly right-skewed. Within groups the Q--Q plots show moderate deviations at the ends, and Prague~7 and Prague~1 show the most skewness; the Shapiro--Wilk results in Table~\ref{tab:norm} supplement but do not override the plots, since with 200 caf\'es the test flags small deviations.
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.9]{figures/distributions.pdf}
+\caption{Histograms with density curves of the numeric variables ($n = \Nall$ caf\'es).}
+\label{fig:dist}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.9]{figures/boxplots.pdf}
+\caption{Box plots of the numeric variables ($n = \Nall$ caf\'es). Points beyond the whiskers are outliers.}
+\label{fig:box}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.95]{figures/groups_side_by_side.pdf}
+\caption{Cappuccino price (CZK) by location, district and caf\'e type, side by side. Boxes show the median and quartiles; points are individual caf\'es.}
+\label{fig:groups}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\inputfigure[0.95]{figures/qq_plots.pdf}
+\caption{Normal Q--Q plots of the cappuccino price (all caf\'es and by group) and of the cappuccino-minus-espresso difference. The line is the normal reference.}
+\label{fig:qq}
+\end{figure}
+
+\begin{table}[ht]
+\centering\small
+\caption{Skewness and Shapiro--Wilk test by sample (the test supplements the plots; the plots have priority).}
+\label{tab:norm}
+\inputtable{tables/normality.tex}
+\end{table}
+
+\section{Regression diagnostics}\label{app:diag}
+Each figure shows the residuals against the fitted values, the normal Q--Q plot of the residuals, and the residuals against leverage with Cook's distance contours. Influential caf\'es are named by their row number in the cleaned dataset. Variance inflation factors for A8 are close to one (distance \AeightVifDist, type \AeightVifType). Removing the \AsevenNinfl{} influential caf\'es from the simple CZK regression changes the slope to \AsevenBinfl{} CZK per km, and removing the influential caf\'es from the A8 model changes the distance slope to \AeightBinfl{} CZK per km; the direction is unchanged, but the slope is smaller and the interval wider.
+
+\begin{figure}[ht]
+\centering
+\inputfigure[1]{figures/A7_diagnostics_lin.pdf}
+\caption{Diagnostics of the linear model of price on distance (A7).}
+\end{figure}
+\begin{figure}[ht]
+\centering
+\inputfigure[1]{figures/A7_diagnostics_log.pdf}
+\caption{Diagnostics of the log-linear model of log(price) on distance (A7).}
+\end{figure}
+\begin{figure}[ht]
+\centering
+\inputfigure[1]{figures/A8_diagnostics.pdf}
+\caption{Diagnostics of the multiple regression of price on distance and caf\'e type (A8).}
+\end{figure}
+\begin{figure}[ht]
+\centering
+\inputfigure[1]{figures/A9_diagnostics.pdf}
+\caption{Diagnostics of the interaction model of price on distance, chain indicator and their interaction (A9).}
+\end{figure}
+
+\section{Alternative tests and robustness}\label{app:robust}
+Tables~\ref{tab:A1}--\ref{tab:A10} give, for each analysis, both methods named in the brief and the supporting statistics. Table~\ref{tab:rob} repeats the distance analysis under reasonable alternative choices. In every variant the correlation stays between \RobMinR{} and \RobMaxR; the slope is somewhat larger without the most distant caf\'es and smaller without the influential caf\'es, and its robust interval reaches zero in most variants.
+
+\begin{table}[ht]\centering\small
+\caption{A1: one-sample tests against the benchmark ($n = \AoneN$). Estimates in CZK; $r_{rb}$ is the rank-biserial correlation.}\label{tab:A1}
+\widetable{tables/A1_table.tex}\end{table}
+\begin{table}[ht]\centering\small
+\caption{A2: Prague~1 minus the rest of Prague. The Welch estimate is the difference in means, the Wilcoxon estimate the Hodges--Lehmann shift; $p$-values are one-tailed.}\label{tab:A2}
+\widetable{tables/A2_table.tex}\end{table}
+\begin{table}[ht]\centering\small
+\caption{A3: cappuccino minus espresso price in the same caf\'e ($n = \AthreeN$ pairs); $p$-values are one-tailed.}\label{tab:A3}
+\widetable{tables/A3_table.tex}\end{table}
+\begin{table}[ht]\centering\small
+\caption{A4: omnibus tests of cappuccino price across six districts ($n = \AfourN$).}\label{tab:A4}
+\widetable{tables/A4_table.tex}\end{table}
+\begin{table}[ht]\centering\small
+\caption{A4: Games--Howell post hoc comparisons between districts (difference in mean price, 95\% confidence interval, adjusted $p$).}\label{tab:A4gh}
+\inputtable{tables/A4_posthoc_gameshowell.tex}\end{table}
+\begin{table}[ht]\centering\small
+\caption{A4: Dunn post hoc comparisons between districts with Holm adjustment.}\label{tab:A4dunn}
+\inputtable{tables/A4_posthoc_dunn.tex}\end{table}
+\begin{table}[ht]\centering\small
+\caption{A5: counts and row percentages of caf\'e type by location ($N = \AfiveN$) and standardised residuals for Prague~1.}\label{tab:A5c}
+\widetable{tables/A5_counts.tex}\end{table}
+\begin{table}[ht]\centering\small
+\caption{A5: chi-square and Fisher's exact tests; $^{b}$ marks bootstrap intervals.}\label{tab:A5}
+\widetable{tables/A5_table.tex}\end{table}
+\begin{table}[ht]\centering\small
+\caption{A6: correlation of price with distance ($n = \AsixN$). $^{b}$: bootstrap percentile interval (5{,}000 resamples, seed 2026); $p$-values are one-tailed.}\label{tab:A6}
+\widetable{tables/A6_table.tex}\end{table}
+\begin{table}[ht]\centering\small
+\caption{A7: simple regressions of price (CZK) and of log(price) on distance; HC3 robust standard errors in parentheses, 95\% confidence intervals in brackets.}\label{tab:A7}
+\inputtable{tables/A7_table.tex}\end{table}
+\begin{table}[ht]\centering\small
+\caption{A10: logistic regression of price above 83 CZK on distance and caf\'e type: average marginal effect, odds ratio and fit.}\label{tab:A10}
+\widetable{tables/A10_table.tex}\end{table}
+\begin{table}[ht]\centering\small
+\caption{Robustness of the distance result: Pearson $r$, Spearman $\rho$, the slope in crowns per kilometre with its HC3 robust interval, and the percentage change per kilometre from the log model.}\label{tab:rob}
+\widetable{tables/robustness.tex}\end{table}
+
+\section{Reproducibility}\label{app:repro}
+The repository is at \todo{GitHub link to your own repository}. It has three folders: \texttt{analysis} (raw data \texttt{cafe\_raw.csv}, the three scripts and the cleaned dataset), \texttt{report} (this source, the PDF, \texttt{tables} and \texttt{figures}) and \texttt{presentation}. Run, from the repository root and in this order, \texttt{analysis/01\_cleaning.R}, \texttt{analysis/02\_descriptives.R} and \texttt{analysis/03\_tests.R}; paths are relative, every bootstrap uses seed 2026, and all tables and figures in this report are produced by these scripts. R and package versions: \todo{copy them from \texttt{sessionInfo()} on your computer}.
+
+\end{document}

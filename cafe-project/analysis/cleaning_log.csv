@@ -1,0 +1,11 @@
+"step","decision","cafes_affected"
+"Empty rows","Rows with no student and no cafe name dropped",99
+"District labels","Harmonised to 'Prague N' (case, spaces, typos)",20
+"Cafe type","Blank type set to missing (case harmonised)",1
+"Espresso price","Several prices in a cell: first listed price kept",12
+"Cappuccino price","Several prices in a cell: first listed price kept",12
+"Flat white price","Several prices in a cell: first listed price kept",3
+"Filter price","Several prices in a cell: first listed price kept",8
+"Number of ratings","Thousands separator removed",6
+"Distance","Given distance (km) used; no missing values expected",0
+"Duplicate cafes","Same cafe + address recorded twice: first record kept",1
