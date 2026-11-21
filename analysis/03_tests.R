@@ -32,7 +32,7 @@ ALPHA <- .05       # significance level, stated once in the report
 # ---- written down BEFORE you open the data. >>> REPLACE THIS VALUE WITH YOUR OWN. <<<
 BENCHMARK <- 90
 
-COP <- "#7d2bb8"; ESP <- "#2B1D16"; GREY <- "#8A7F76"; PALE <- "#E7E2DC"
+COP <- "#512bb8"; ESP <- "#2B1D16"; GREY <- "#8A7F76"; PALE <- "#E7E2DC"
 theme_set(theme_minimal(base_size = 11) +
           theme(panel.grid.minor = element_blank(),
                 plot.title = element_text(face = "bold"),
