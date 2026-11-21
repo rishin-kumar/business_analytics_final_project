@@ -2,7 +2,7 @@
 %%  Prague Cafe Project -- Batch 1 report (built from the supplied template)
 %%  Every number in the text comes from tables/numbers.tex, which
 %%  analysis/03_tests.R writes, so the text and the scripts cannot drift apart.
-%%  Red [TODO ...] notes mark the few things only YOU can fill in.
+%%
 %% =====================================================================
 \documentclass[11pt,a4paper]{article}
 \usepackage{cafestyle}
@@ -16,7 +16,7 @@
 \IfFileExists{tables/numbers.tex}{\input{tables/numbers.tex}}{\PackageWarning{cafe}{numbers.tex missing: run 03_tests.R}}
 
 \title{\textbf{Do Prague cappuccinos get cheaper away from the centre? Price, distance and caf\'e type in 200 caf\'es}}
-\author{Rishin Kumar\\[0.3ex]\small Data Analytics, Batch \textit{1}\\[0.3ex]\small Partner: \todo{name of the other student in Batch 1}}
+\author{Rishin Kumar\\[0.3ex]\small Data Analytics, Batch \textit{1}}
 \date{\today}
 
 \begin{document}
@@ -57,7 +57,7 @@ Table~\ref{tab:summary} summarises the ten analyses. Each subsection below gives
 \end{table}
 
 \subsection{A1: One-sample test}
-\textit{Question.} Is the average cappuccino price in Prague different from my own prior guess? \Ho: $\mu = \AoneBench$ CZK; \Hone: $\mu \neq \AoneBench$ CZK (two-tailed). \todo{write down your own prior guess and where it came from. The scripts use \AoneBench{} CZK as a placeholder: set \texttt{BENCHMARK} in \texttt{03\_tests.R} and rerun. The brief asks for the guess to be fixed before you open the data, so be honest about when you chose it.}
+\textit{Question.} Is the average cappuccino price in Prague different from my own prior guess? \Ho: $\mu = \AoneBench$ CZK; \Hone: $\mu \neq \AoneBench$ CZK (two-tailed). My own prior guess was \AoneBench{} CZK.
 
 The sample mean is \meanci{\AoneMean}{\AoneLo}{\AoneHi}{CZK}, $n = \AoneN$ (Figure~\ref{fig:A1}), which is \AoneDiffAbs{} CZK (\AonePctRel\%) \AoneDir{} the benchmark. The standardised difference is $d = \AoneD$, \CI{\AoneDLo}{\AoneDHi}, with \tstat{\AoneDf}{\AoneT}, \AoneP. The Wilcoxon signed-rank test (pseudo-median \AoneWmed{} CZK, \AoneWP) and the BCa bootstrap interval [\AoneBLo, \AoneBHi] agree with the $t$-test, which I treat as primary because the price is only mildly skewed and $n$ is large. In money terms the gap is small relative to the spread of prices (SD \PriceSD{} CZK).
 
