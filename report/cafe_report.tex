@@ -4,8 +4,18 @@
 %%  analysis/03_tests.R writes, so the text and the scripts cannot drift apart.
 %%
 %% =====================================================================
+% chktex-file 8
+% chktex-file 13
+% chktex-file 24
+% chktex-file 36
+% Find tables/ and figures/ whether LaTeX is run from report/ or from the repository root
+\makeatletter
+\def\input@path{{./}{report/}{../report/}}
+\makeatother
+
 \documentclass[11pt,a4paper]{article}
 \usepackage{cafestyle}
+\graphicspath{{./}{report/}{../report/}}
 
 \newcommand{\inputtable}[1]{\IfFileExists{#1}{\input{#1}}{\par\noindent\fbox{\parbox{0.9\linewidth}{\centering Missing table file: \texttt{\detokenize{#1}}}}\par}}
 \newcommand{\inputfigure}[2][0.85]{\IfFileExists{#2}{\includegraphics[width=#1\linewidth]{#2}}{\fbox{\parbox{0.8\linewidth}{\centering Missing figure file: \texttt{\detokenize{#2}}}}}}
