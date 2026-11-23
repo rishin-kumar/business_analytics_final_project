@@ -1,7 +1,7 @@
 # Fdb version 4
-["pdflatex"] 1795439783.25051 "/Users/rishinkumar/Documents/College /02 Business Analytics/Final Project/presentation/slides.tex" "slides.pdf" "slides" 1795439784.87629 0
+["pdflatex"] 1795441126.18541 "/Users/rishinkumar/Documents/College /02 Business Analytics/Final Project/presentation/slides.tex" "slides.pdf" "slides" 1795441127.90767 0
   "../report/tables/numbers.tex" 1795295965.75291 7179 50b4ce64f53ed3f6ac14129c78a89d8e ""
-  "/Users/rishinkumar/Documents/College /02 Business Analytics/Final Project/presentation/slides.tex" 1795439726.47315 7710 c39756c4412615461c9adae28d7447b9 ""
+  "/Users/rishinkumar/Documents/College /02 Business Analytics/Final Project/presentation/slides.tex" 1795441116.6437 13020 d9dd0490a5391dffa384768e84b21d04 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2026/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/tfm/adobe/palatino/pplb8r.tfm" 1136768653 2532 9ad73cf4dd2173a847f2a5f5608e0b9a ""
@@ -208,6 +208,7 @@
   "/usr/local/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1774209607 3636776 dc5fa9b6b1453b9d196cd42edf876004 ""
   "/usr/local/texlive/2026/texmf.cnf" 1774209515 577 648cd9f92f9c0eac486f4c71c85cfbbe ""
   "figures/A10_figure.png" 1795295965.72523 148939 5f1b5e3df5f42457e9b5ec4df8250601 ""
+  "figures/A1_figure.png" 1795295960.36055 76855 ec959314469a63b5a1c574db0cb63249 ""
   "figures/A2_figure.png" 1795295961.04053 121863 6b9758864eeaf0125436c90bbe8ada46 ""
   "figures/A3_figure.png" 1795295961.31195 70489 008ed2c1db61cb0fb7f46a92224f3140 ""
   "figures/A4_figure.png" 1795295962.44875 129540 043b21e9063354112c39c3ea07752697 ""
@@ -216,10 +217,10 @@
   "figures/A7_figure.png" 1795295965.16685 165010 e96822e68922cb83a94840c8691191fd ""
   "figures/A8_figure.png" 1795295965.39634 164144 996c7a67699c329060db0202bbb10ffa ""
   "figures/A9_figure.png" 1795295965.59534 171229 7fdf729a3e1c67ec337575fc932c4b51 ""
-  "slides.aux" 1795439784.80842 1722 20e91bfaba50c3806d05ddd6b6b8b67e "pdflatex"
-  "slides.nav" 1795439784.80923 1109 07396102f9d82bf25877ba7d82798efb "pdflatex"
-  "slides.out" 1795439783.77914 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
-  "slides.tex" 1795439726.47315 7710 c39756c4412615461c9adae28d7447b9 ""
+  "slides.aux" 1795441127.83855 1851 97126c382d6e481c57976def502c453b "pdflatex"
+  "slides.nav" 1795441127.83941 1202 a971439ba5eedf62b158aa4c3f07763d "pdflatex"
+  "slides.out" 1795441126.71439 0 d41d8cd98f00b204e9800998ecf8427e "pdflatex"
+  "slides.tex" 1795441116.6437 13020 d9dd0490a5391dffa384768e84b21d04 ""
   (generated)
   "slides.aux"
   "slides.log"

@@ -1,5 +1,6 @@
 %% Prague Cafe Project -- Batch 1 slides (Beamer). Numbers come from ../report/tables/numbers.tex,
-%% which analysis/03_tests.R writes. Compile from this folder:  pdflatex slides.tex  (twice)
+%% which analysis/03_tests.R writes. Graphs are read from figures/ (A1_figure.png ... A10_figure.png),
+%% which analysis/03_tests.R writes into this folder. Compile from this folder:  latexmk -pdf slides.tex
 \documentclass[aspectratio=169,11pt]{beamer}
 \usepackage[T1]{fontenc}
 \usepackage{mathpazo}
@@ -30,18 +31,42 @@
 \setbeamertemplate{footline}{\hfill\color{greyc}\small\insertframenumber\hspace{1em}\vspace{0.6em}}
 \setbeamertemplate{itemize items}[circle]
 
-\newcommand{\figs}[2]{\includegraphics[width=0.48\linewidth]{figures/#1}\hfill\includegraphics[width=0.48\linewidth]{figures/#2}}
+\graphicspath{{figures/}}   % all graphs live in presentation/figures/  (A1_figure.png ... A10_figure.png)
+
+% how the notes (the spoken script) are shown:
+%   pdflatex slides.tex                                         -> slides only
+%   pdflatex -jobname=slides_script "\def\withscript{1}\input{slides.tex}"   -> slides + script after each slide
+\ifdefined\withscript
+  \setbeameroption{show notes}
+  \setbeamertemplate{note page}[plain]
+  \setbeamerfont{note page}{size=\large}
+\fi
+
+% one slide per question (A1 ... A10), each built with \qframe; the spoken script is in the \note after it
+% \qframe{title}{graph file}{stat 1 big}{stat 1 small}{stat 2 big}{stat 2 small}{test / reading line}{takeaway}
 \newcommand{\stat}[2]{\colorbox{pale}{\parbox{0.9\linewidth}{\color{copper}\Large\bfseries #1\par\color{espresso}\small #2}}\par\vspace{0.5em}}
+\newcommand{\qnote}[1]{\par\vspace{0.3em}{\small\color{greyc}#1}}
+\newcommand{\tk}[1]{\vfill\noindent\colorbox{copper}{\parbox{\dimexpr\linewidth-2\fboxsep}{\color{white}\bfseries\ Takeaway: #1}}\vspace{0.2em}}
+\newcommand{\qframe}[8]{%
+\begin{frame}{#1}
+\begin{columns}[T]
+\column{0.60\textwidth}\centering\includegraphics[width=0.92\linewidth]{#2}
+\column{0.37\textwidth}
+\stat{#3}{#4}
+\stat{#5}{#6}
+\qnote{#7}
+\end{columns}
+\tk{#8}
+\end{frame}}
 
 \title{Does a Prague cappuccino get cheaper away from the centre?}
-\subtitle{Price, distance and caf\'e type in \Nall{} caf\'es \,\textperiodcentered\, Batch 1}
 \author{Rishin Kumar}
 \institute{Business Analytics, BANL 1100/1101}
 \date{}
 
 \begin{document}
 
-% 1 ---------------------------------------------------------------
+% Title ----------------------------------------------------------
 {\setbeamercolor{background canvas}{bg=espresso}\setbeamercolor{normal text}{fg=white}\setbeamercolor{itemize body}{fg=white}
 \begin{frame}[plain]
 \color{white}
@@ -52,108 +77,88 @@
 \vspace{1.5cm}
 {\small Rishin Kumar \,\textperiodcentered\, Business Analytics, BANL 1100/1101}
 \end{frame}}
+\note{Good morning, everyone. I'm Rishin. I looked at one question in the class's Prague caf\'e dataset: does a cappuccino get cheaper as you move away from the centre? I planned ten analyses in advance. For each finding, I'll tell you which test backs it up and why I trust it. The data: \Nall{} caf\'es after cleaning, visited by ten students. The average cappuccino costs \PriceMean{} crowns, and the typical caf\'e is \DistMedian{} kilometres from the Orloj. Everything I say is ``in this sample'': it is a convenience sample, not a random sample of Prague. Cleaning is all done in an R script, so anyone can rerun it and get my numbers.}
 
-% 2 ---------------------------------------------------------------
-\begin{frame}{The data: \Nall{} caf\'es visited by ten students}
-\begin{columns}[T]
-\column{0.24\textwidth}\stat{\Nall}{caf\'es after cleaning}
-\column{0.24\textwidth}\stat{\PriceMean{} CZK}{mean cappuccino, SD \PriceSD}
-\column{0.24\textwidth}\stat{\DistMedian{} km}{median distance from the Orloj}
-\column{0.24\textwidth}\stat{\Ntests{} tests}{counted across the report}
-\end{columns}
-\vspace{0.6em}
-\begin{itemize}\setlength\itemsep{0.7em}
-\item Raw sheet: \Nraw{} rows, \Nfilled{} filled; \ClnEmpty{} empty rows and one duplicate caf\'e removed.
-\item Messy cells fixed in code: district typos, and \ClnCap{} cells listing several prices (first listed price kept).
-\item Convenience sample, not random: everything is ``in this sample''.
-\end{itemize}
-\end{frame}
+% One file per question ------------------------------------------
+%% A1.tex -- slide for question A1; the graph is figures/A1_figure.png
+\qframe{A1: Is the average price different from my prior guess?}{A1_figure.png}
+  {\AoneMean{} CZK}{mean cappuccino, 95\% CI \CI{\AoneLo}{\AoneHi}}
+  {$d$ = \AoneD}{one-sample $t$-test vs.\ \AoneBench{} CZK, \AoneP}
+  {Wilcoxon and BCa bootstrap agree. Prior guess: \AoneBench{} CZK.}
+  {A typical cappuccino costs about 83 CZK.}
+\note{A1. What does a cappuccino cost? About \AoneMean{} crowns, with a 95 percent interval from \AoneLo{} to \AoneHi. [Say your own prior guess here, when you wrote it down, and the result. The file currently uses \AoneBench{} crowns as a placeholder.] I used a one-sample $t$-test. Defence: the price is only mildly skewed and the sample is large, and the Wilcoxon test and a bootstrap interval give the same answer.}
 
-% 3 ---------------------------------------------------------------
-\begin{frame}{Typical price: 83 CZK; a cappuccino costs 28\% more than an espresso}
-\begin{columns}[T]
-\column{0.6\textwidth}\centering\includegraphics[width=\linewidth]{figures/A3_figure.png}
-\column{0.36\textwidth}
-\stat{+\AthreeM{} CZK}{cappuccino $-$ espresso, 95\% CI \CI{\AthreeLo}{\AthreeHi}}
-\stat{$d_z$ = \AthreeDz}{paired $t$-test, \AthreeP{} (one-tailed)}
-\small A1: mean cappuccino \AoneMean{} CZK, 95\% CI \CI{\AoneLo}{\AoneHi}.
-\end{columns}
-\end{frame}
+%% A2.tex -- slide for question A2; the graph is figures/A2_figure.png
+\qframe{A2: Is Prague 1 dearer than the rest of Prague?}{A2_figure.png}
+  {+\AtwoDiff{} CZK}{Prague 1 $-$ rest, 95\% CI \CI{\AtwoLo}{\AtwoHi}}
+  {$d$ = \AtwoD}{Welch $t$-test, \AtwoP{} (one-tailed)}
+  {Rank-sum check: \AtwoWP, shift \AtwoHL{} CZK. The tests only partly agree.}
+  {Prague 1 is probably a few crowns dearer, but the tests only partly agree.}
+\note{A2. Prague 1 averages \AtwoMa{} crowns against \AtwoMb{} elsewhere: \AtwoDiff{} crowns more, interval \AtwoLo{} to \AtwoHi, a small-to-medium effect. Welch's test, one-tailed as planned, gives \AtwoP. But the rank-based Wilcoxon test gives \AtwoWP{} and a typical shift of only \AtwoHL{} crowns. Defence: I chose Welch because the question is about averages and both groups are large, but I report the disagreement rather than hide it. A few very dear Prague 1 caf\'es pull the average up, so the honest summary is: probably 3 to 6 crowns dearer, under ten percent of the price.}
 
-% 4 ---------------------------------------------------------------
-\begin{frame}{Prague 1 is about 6 CZK dearer, but the tests only partly agree}
-\begin{columns}[T]
-\column{0.6\textwidth}\centering\includegraphics[width=\linewidth]{figures/A2_figure.png}
-\column{0.36\textwidth}
-\stat{+\AtwoDiff{} CZK}{Prague 1 $-$ rest, 95\% CI \CI{\AtwoLo}{\AtwoHi}}
-\stat{$d$ = \AtwoD}{Welch $t$-test, \AtwoP{} (one-tailed)}
-\small Rank-sum check: \AtwoWP, shift \AtwoHL{} CZK, not significant.
-\end{columns}
-\end{frame}
+%% A3.tex -- slide for question A3; the graph is figures/A3_figure.png
+\qframe{A3: How much more is a cappuccino than an espresso?}{A3_figure.png}
+  {+\AthreeM{} CZK}{cappuccino $-$ espresso, 95\% CI \CI{\AthreeLo}{\AthreeHi}}
+  {$d_z$ = \AthreeDz}{paired $t$-test, \AthreeP{} (one-tailed)}
+  {About \AthreePctEsp\% on top of the espresso price. Wilcoxon agrees.}
+  {A cappuccino costs about 28\% more than an espresso.}
+\note{A3. In the same caf\'e, the cappuccino costs \AthreeM{} crowns more than the espresso, interval \AthreeLo{} to \AthreeHi: about \AthreePctEsp{} percent more. Paired $t$-test, one-tailed because I expected the cappuccino to be dearer, \AthreeP. Defence: pairing compares each caf\'e with itself, so differences between caf\'es cannot distort it, and the Wilcoxon test, which makes no normality assumption, agrees.}
 
-% 5 ---------------------------------------------------------------
-\begin{frame}{Districts look alike; international chains cluster in Prague 1}
-\centering\figs{A4_figure.png}{A5_figure.png}
-\begin{itemize}\small\setlength\itemsep{0.3em}
-\item Six districts: Welch $F(\AfourDfa,\,\AfourDfb)$ = \AfourF, \AfourP, $\eta^2$ = \AfourEta; no pair differs after adjustment.
-\item Caf\'e type vs Prague 1: Fisher \AfiveFisherP, $V$ = \AfiveV; \AfiveKInt{} of \AfiveNInt{} international chains are in Prague 1.
-\end{itemize}
-\end{frame}
+%% A4.tex -- slide for question A4; the graph is figures/A4_figure.png
+\qframe{A4: Do prices differ across the six districts?}{A4_figure.png}
+  {$F(\AfourDfa,\,\AfourDfb)$ = \AfourF}{Welch ANOVA, \AfourP}
+  {$\eta^2$ = \AfourEta}{95\% CI \CI{\AfourEtaLo}{\AfourEtaHi}}
+  {Kruskal--Wallis agrees (\AfourKWP). No pair of districts differs after adjustment.}
+  {No clear price differences between districts.}
+\note{A4. Welch's ANOVA gives \AfourP{} and the Kruskal--Wallis test \AfourKWP. Districts explain only about 6 percent of the variation. No single pair of districts differs once I correct for comparing many pairs. Defence: with fifteen pairs some will look different by chance, which is why I used Games--Howell and Dunn--Holm corrections. The biggest gap, \AfourBestPair, is \AfourBestDiff{} crowns, but its interval includes zero.}
 
-% 6 ---------------------------------------------------------------
-\begin{frame}{Price falls with distance, but only weakly}
-\begin{columns}[T]
-\column{0.6\textwidth}\centering\includegraphics[width=\linewidth]{figures/A6_figure.png}
-\column{0.36\textwidth}
-\stat{$r$ = \AsixR}{Pearson, 95\% CI \CI{\AsixRLo}{\AsixRHi}}
-\stat{\AsixP}{one-tailed; distance shares \AsixRsq\% of price variance}
-\small Spearman $\rho$ = \AsixRho{} and Kendall $\tau$ = \AsixTau{} agree.
-\end{columns}
-\end{frame}
+%% A5.tex -- slide for question A5; the graph is figures/A5_figure.png
+\qframe{A5: Is caf\'e type linked to being in Prague 1?}{A5_figure.png}
+  {\AfiveFisherP}{Fisher's exact test}
+  {$V$ = \AfiveV}{Cram\'er's $V$, 95\% CI \CI{\AfiveVLo}{\AfiveVHi}}
+  {\AfiveKInt{} of \AfiveNInt{} international chains are in Prague 1.}
+  {International chains cluster in Prague 1; suggestive, not conclusive.}
+\note{A5. \AfiveKInt{} of the \AfiveNInt{} international chains, about \AfiveShareInt{} percent, are in Prague 1, compared with about \AfiveShareInd{} percent of independents. Fisher's exact test gives \AfiveFisherP. Defence: I used Fisher's test instead of chi-square because one expected count is small. The pattern is suggestive, not conclusive.}
 
-% 7 ---------------------------------------------------------------
-\begin{frame}{About 2 CZK per km, and it survives controlling for caf\'e type}
-\centering\figs{A7_figure.png}{A8_figure.png}
-\begin{itemize}\small\setlength\itemsep{0.3em}
-\item A7: \AsevenPct\% per km (robust CI \CI{\AsevenPctLo}{\AsevenPctHi}, \AsevenLogP); \AsevenB{} CZK per km.
-\item A8: slope barely moves with caf\'e type; type adds $\Delta R^2$ = \AeightDeltaR{} (\AeightP); local chains +\AeightLocal{} CZK.
-\end{itemize}
-\end{frame}
+%% A6.tex -- slide for question A6; the graph is figures/A6_figure.png
+\qframe{A6: Does price fall with distance from the Orloj?}{A6_figure.png}
+  {$r$ = \AsixR}{Pearson, 95\% CI \CI{\AsixRLo}{\AsixRHi}}
+  {\AsixP}{one-tailed; distance shares \AsixRsq\% of price variance}
+  {Spearman $\rho$ = \AsixRho{} and Kendall $\tau$ = \AsixTau{} agree.}
+  {Farther from the centre, prices are slightly lower.}
+\note{A6. The scatterplot shows a downward trend, but a weak one. Pearson's correlation is \AsixR, one-tailed \AsixP. Distance explains under three percent of the variation in price. Defence: I decided the direction in advance, which is why a one-tailed test is fair. Distance is skewed, so I also ran Spearman and Kendall correlations, \AsixRho{} and \AsixTau: the same story.}
 
-% 8 ---------------------------------------------------------------
-\begin{frame}{Slopes don't clearly differ by type; farther caf\'es are less likely to be dear}
-\centering\figs{A9_figure.png}{A10_figure.png}
-\begin{itemize}\small\setlength\itemsep{0.3em}
-\item A9: interaction \AnineInt{} CZK/km, CI \CI{\AnineIntLo}{\AnineIntHi}, \AnineP; no clear difference.
-\item A10: \AtenAME{} percentage points per km (CI \CI{\AtenAMELo}{\AtenAMEHi}, \AtenP); OR \AtenOR.
-\end{itemize}
-\end{frame}
+%% A7.tex -- slide for question A7; the graph is figures/A7_figure.png
+\qframe{A7: By how much does price change per kilometre?}{A7_figure.png}
+  {\AsevenPct\% per km}{log-linear, robust 95\% CI \CI{\AsevenPctLo}{\AsevenPctHi}}
+  {\AsevenLogP}{two-tailed, HC3 robust standard errors}
+  {About \AsevenB{} CZK per km. \AsevenNinfl{} influential caf\'es: without them \AsevenBinfl{} CZK per km.}
+  {About 2\% cheaper per km: a small, uncertain effect.}
+\note{A7. Each extra kilometre goes with a price change of about \AsevenPct{} percent, roughly \AsevenB{} crowns. The interval runs from \AsevenPctLo{} to \AsevenPctHi{} percent, so it just touches zero. Defence: this test is two-tailed with robust standard errors, so it is stricter than A6, which is why it is less conclusive. Eleven influential caf\'es matter: without them the slope is about \AsevenBinfl{} crowns, still negative. This shows an association only: rent, tourist traffic and caf\'e type all move with distance, so the data cannot say why prices fall.}
 
-% 9 ---------------------------------------------------------------
-\begin{frame}{Take-aways}
-\renewcommand{\arraystretch}{1.9}
-\begin{tabular}{@{}p{2.2cm}p{10cm}@{}}
-\colorbox{copper}{\color{white}\bfseries\ Baseline\ } & Cappuccino $\approx$ \AoneMean{} CZK; +28\% over espresso (A1, A3)\\
-\colorbox{copper}{\color{white}\bfseries\ Centre\ } & Prague 1 $\approx$ +6 CZK; tests partly disagree (A2)\\
-\colorbox{copper}{\color{white}\bfseries\ Distance\ } & $-$2 CZK or $-$2\% per km; weak, CI touches 0 (A6--A8, A10)\\
-\colorbox{copper}{\color{white}\bfseries\ Type\ } & Chains charge more; slope the same for both (A8, A9)\\
-\colorbox{copper}{\color{white}\bfseries\ Districts\ } & No clear differences (A4)\\
-\end{tabular}
-\end{frame}
+%% A8.tex -- slide for question A8; the graph is figures/A8_figure.png
+\qframe{A8: Does the distance effect survive controlling for caf\'e type?}{A8_figure.png}
+  {\AeightBa{} $\to$ \AeightBb{}}{distance slope (CZK/km) without $\to$ with caf\'e type}
+  {$\Delta R^2$ = \AeightDeltaR}{nested $F$-test, \AeightP}
+  {Local chains charge +\AeightLocal{} CZK over independents at the same distance.}
+  {Distance still matters after caf\'e type, and chains charge more.}
+\note{A8. Once I add caf\'e type, the distance slope barely moves, from \AeightBa{} to \AeightBb{} crowns per kilometre. Caf\'e type itself improves the model, nested $F$-test \AeightP, and local chains charge about \AeightLocal{} crowns more than independents at the same distance. Defence: the variance inflation factors are close to one, so distance and type carry separate information.}
 
-% 10 --------------------------------------------------------------
-{\setbeamercolor{background canvas}{bg=espresso}\setbeamercolor{normal text}{fg=white}\setbeamercolor{itemize body}{fg=white}
-\begin{frame}[plain]
-\color{white}
-\vspace{1.2cm}
-{\Huge\bfseries What the data cannot tell us\par}
-\vspace{0.8cm}
-\begin{itemize}\Large\setlength\itemsep{0.7em}
-\item \color{white}Convenience sample from ten students, not random caf\'es.
-\item \color{white}Observational: distance is associated with price, not the cause.
-\item \color{white}Caf\'es in a district, and rows by one student, are not independent; standard errors may be too small.
-\item \color{white}\Ntests{} tests in total: one borderline $p$-value is not a finding.
-\end{itemize}
-\end{frame}}
+%% A9.tex -- slide for question A9; the graph is figures/A9_figure.png
+\qframe{A9: Does the distance slope differ for independents and chains?}{A9_figure.png}
+  {\AnineInt{} CZK/km}{interaction, robust 95\% CI \CI{\AnineIntLo}{\AnineIntHi}}
+  {\AnineP}{nested $F$-test; $\Delta R^2$ = \AnineDeltaR}
+  {Slopes: independents \AnineSlopeInd, chains \AnineSlopeCh{} CZK/km. No clear difference.}
+  {No clear evidence that the distance effect differs for chains.}
+\note{A9. The slope is \AnineSlopeInd{} crowns per kilometre for independents and \AnineSlopeCh{} for chains. That looks different, but the interaction has \AnineP{} and an interval from \AnineIntLo{} to \AnineIntHi. Defence: no clear difference is not the same as evidence the slopes are equal. The data are simply too noisy to tell.}
+
+%% A10.tex -- slide for question A10; the graph is figures/A10_figure.png
+\qframe{A10: How does the chance of an above-median price change per km?}{A10_figure.png}
+  {\AtenAME{} pp per km}{average marginal effect, 95\% CI \CI{\AtenAMELo}{\AtenAMEHi}}
+  {OR = \AtenOR}{logit, \AtenP}
+  {Outcome: price above 83 CZK (the brief's median).}
+  {Each extra km lowers the chance of an above-median price by about 5 points.}
+\note{A10. I turned price into a yes-or-no question: is a cappuccino above 83 crowns, the median in the project brief? In a logistic regression each extra kilometre changes that probability by an average of \AtenAME{} percentage points, interval \AtenAMELo{} to \AtenAMEHi, \AtenP; the odds ratio is \AtenOR. Defence: I report percentage points because they are easier to read than odds. It points the same way as everything else, but the interval includes zero, so I am not overselling it. To close: I ran \Ntests{} tests in total, so one borderline $p$-value is not a finding, which is why I focus on the ten planned analyses and on effect sizes and intervals. This is a convenience sample, the data are observational, and caf\'es in the same district are not fully independent. Thank you; I am happy to take questions.}
+
 
 \end{document}
