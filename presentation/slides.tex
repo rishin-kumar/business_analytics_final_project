@@ -1,0 +1,159 @@
+%% Prague Cafe Project -- Batch 1 slides (Beamer). Numbers come from ../report/tables/numbers.tex,
+%% which analysis/03_tests.R writes. Compile from this folder:  pdflatex slides.tex  (twice)
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage{mathpazo}
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+\definecolor{espresso}{HTML}{2B1D16}
+\definecolor{copper}{HTML}{B8622B}
+\definecolor{pale}{HTML}{E7E2DC}
+\definecolor{greyc}{HTML}{8A7F76}
+
+% macros that numbers.tex expects
+\newcommand{\pval}[1]{$p$\,=\,#1}
+\newcommand{\plt}[1]{$p$\,<\,#1}
+\newcommand{\CI}[2]{[#1,\,#2]}
+\input{../report/tables/numbers.tex}
+
+\usetheme{default}
+\usefonttheme{serif}
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{title}{fg=espresso}
+\setbeamercolor{frametitle}{fg=espresso}
+\setbeamercolor{normal text}{fg=espresso}
+\setbeamercolor{itemize item}{fg=copper}
+\setbeamerfont{frametitle}{series=\bfseries,size=\Large}
+\setbeamertemplate{frametitle}{\vspace{0.4em}\insertframetitle}
+\setbeamertemplate{footline}{\hfill\color{greyc}\small\insertframenumber\hspace{1em}\vspace{0.6em}}
+\setbeamertemplate{itemize items}[circle]
+
+\newcommand{\figs}[2]{\includegraphics[width=0.48\linewidth]{figures/#1}\hfill\includegraphics[width=0.48\linewidth]{figures/#2}}
+\newcommand{\stat}[2]{\colorbox{pale}{\parbox{0.9\linewidth}{\color{copper}\Large\bfseries #1\par\color{espresso}\small #2}}\par\vspace{0.5em}}
+
+\title{Does a Prague cappuccino get cheaper away from the centre?}
+\subtitle{Price, distance and caf\'e type in \Nall{} caf\'es \,\textperiodcentered\, Batch 1}
+\author{Rishin Kumar}
+\institute{Business Analytics, BANL 1100/1101}
+\date{}
+
+\begin{document}
+
+% 1 ---------------------------------------------------------------
+{\setbeamercolor{background canvas}{bg=espresso}\setbeamercolor{normal text}{fg=white}\setbeamercolor{itemize body}{fg=white}
+\begin{frame}[plain]
+\color{white}
+\vspace{2.2cm}
+{\Huge\bfseries Does a Prague cappuccino get cheaper away from the centre?\par}
+\vspace{0.8cm}
+{\large\color{copper!60!white} Price, distance and caf\'e type in \Nall{} caf\'es \,\textperiodcentered\, Batch 1\par}
+\vspace{1.5cm}
+{\small Rishin Kumar \,\textperiodcentered\, Business Analytics, BANL 1100/1101}
+\end{frame}}
+
+% 2 ---------------------------------------------------------------
+\begin{frame}{The data: \Nall{} caf\'es visited by ten students}
+\begin{columns}[T]
+\column{0.24\textwidth}\stat{\Nall}{caf\'es after cleaning}
+\column{0.24\textwidth}\stat{\PriceMean{} CZK}{mean cappuccino, SD \PriceSD}
+\column{0.24\textwidth}\stat{\DistMedian{} km}{median distance from the Orloj}
+\column{0.24\textwidth}\stat{\Ntests{} tests}{counted across the report}
+\end{columns}
+\vspace{0.6em}
+\begin{itemize}\setlength\itemsep{0.7em}
+\item Raw sheet: \Nraw{} rows, \Nfilled{} filled; \ClnEmpty{} empty rows and one duplicate caf\'e removed.
+\item Messy cells fixed in code: district typos, and \ClnCap{} cells listing several prices (first listed price kept).
+\item Convenience sample, not random: everything is ``in this sample''.
+\end{itemize}
+\end{frame}
+
+% 3 ---------------------------------------------------------------
+\begin{frame}{Typical price: 83 CZK; a cappuccino costs 28\% more than an espresso}
+\begin{columns}[T]
+\column{0.6\textwidth}\centering\includegraphics[width=\linewidth]{figures/A3_figure.png}
+\column{0.36\textwidth}
+\stat{+\AthreeM{} CZK}{cappuccino $-$ espresso, 95\% CI \CI{\AthreeLo}{\AthreeHi}}
+\stat{$d_z$ = \AthreeDz}{paired $t$-test, \AthreeP{} (one-tailed)}
+\small A1: mean cappuccino \AoneMean{} CZK, 95\% CI \CI{\AoneLo}{\AoneHi}.
+\end{columns}
+\end{frame}
+
+% 4 ---------------------------------------------------------------
+\begin{frame}{Prague 1 is about 6 CZK dearer, but the tests only partly agree}
+\begin{columns}[T]
+\column{0.6\textwidth}\centering\includegraphics[width=\linewidth]{figures/A2_figure.png}
+\column{0.36\textwidth}
+\stat{+\AtwoDiff{} CZK}{Prague 1 $-$ rest, 95\% CI \CI{\AtwoLo}{\AtwoHi}}
+\stat{$d$ = \AtwoD}{Welch $t$-test, \AtwoP{} (one-tailed)}
+\small Rank-sum check: \AtwoWP, shift \AtwoHL{} CZK, not significant.
+\end{columns}
+\end{frame}
+
+% 5 ---------------------------------------------------------------
+\begin{frame}{Districts look alike; international chains cluster in Prague 1}
+\centering\figs{A4_figure.png}{A5_figure.png}
+\begin{itemize}\small\setlength\itemsep{0.3em}
+\item Six districts: Welch $F(\AfourDfa,\,\AfourDfb)$ = \AfourF, \AfourP, $\eta^2$ = \AfourEta; no pair differs after adjustment.
+\item Caf\'e type vs Prague 1: Fisher \AfiveFisherP, $V$ = \AfiveV; \AfiveKInt{} of \AfiveNInt{} international chains are in Prague 1.
+\end{itemize}
+\end{frame}
+
+% 6 ---------------------------------------------------------------
+\begin{frame}{Price falls with distance, but only weakly}
+\begin{columns}[T]
+\column{0.6\textwidth}\centering\includegraphics[width=\linewidth]{figures/A6_figure.png}
+\column{0.36\textwidth}
+\stat{$r$ = \AsixR}{Pearson, 95\% CI \CI{\AsixRLo}{\AsixRHi}}
+\stat{\AsixP}{one-tailed; distance shares \AsixRsq\% of price variance}
+\small Spearman $\rho$ = \AsixRho{} and Kendall $\tau$ = \AsixTau{} agree.
+\end{columns}
+\end{frame}
+
+% 7 ---------------------------------------------------------------
+\begin{frame}{About 2 CZK per km, and it survives controlling for caf\'e type}
+\centering\figs{A7_figure.png}{A8_figure.png}
+\begin{itemize}\small\setlength\itemsep{0.3em}
+\item A7: \AsevenPct\% per km (robust CI \CI{\AsevenPctLo}{\AsevenPctHi}, \AsevenLogP); \AsevenB{} CZK per km.
+\item A8: slope barely moves with caf\'e type; type adds $\Delta R^2$ = \AeightDeltaR{} (\AeightP); local chains +\AeightLocal{} CZK.
+\end{itemize}
+\end{frame}
+
+% 8 ---------------------------------------------------------------
+\begin{frame}{Slopes don't clearly differ by type; farther caf\'es are less likely to be dear}
+\centering\figs{A9_figure.png}{A10_figure.png}
+\begin{itemize}\small\setlength\itemsep{0.3em}
+\item A9: interaction \AnineInt{} CZK/km, CI \CI{\AnineIntLo}{\AnineIntHi}, \AnineP; no clear difference.
+\item A10: \AtenAME{} percentage points per km (CI \CI{\AtenAMELo}{\AtenAMEHi}, \AtenP); OR \AtenOR.
+\end{itemize}
+\end{frame}
+
+% 9 ---------------------------------------------------------------
+\begin{frame}{Take-aways}
+\renewcommand{\arraystretch}{1.9}
+\begin{tabular}{@{}p{2.2cm}p{10cm}@{}}
+\colorbox{copper}{\color{white}\bfseries\ Baseline\ } & Cappuccino $\approx$ \AoneMean{} CZK; +28\% over espresso (A1, A3)\\
+\colorbox{copper}{\color{white}\bfseries\ Centre\ } & Prague 1 $\approx$ +6 CZK; tests partly disagree (A2)\\
+\colorbox{copper}{\color{white}\bfseries\ Distance\ } & $-$2 CZK or $-$2\% per km; weak, CI touches 0 (A6--A8, A10)\\
+\colorbox{copper}{\color{white}\bfseries\ Type\ } & Chains charge more; slope the same for both (A8, A9)\\
+\colorbox{copper}{\color{white}\bfseries\ Districts\ } & No clear differences (A4)\\
+\end{tabular}
+\end{frame}
+
+% 10 --------------------------------------------------------------
+{\setbeamercolor{background canvas}{bg=espresso}\setbeamercolor{normal text}{fg=white}\setbeamercolor{itemize body}{fg=white}
+\begin{frame}[plain]
+\color{white}
+\vspace{1.2cm}
+{\Huge\bfseries What the data cannot tell us\par}
+\vspace{0.8cm}
+\begin{itemize}\Large\setlength\itemsep{0.7em}
+\item \color{white}Convenience sample from ten students, not random caf\'es.
+\item \color{white}Observational: distance is associated with price, not the cause.
+\item \color{white}Caf\'es in a district, and rows by one student, are not independent; standard errors may be too small.
+\item \color{white}\Ntests{} tests in total: one borderline $p$-value is not a finding.
+\end{itemize}
+\end{frame}}
+
+\end{document}

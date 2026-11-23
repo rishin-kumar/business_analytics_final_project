@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1795296320.37868 "/Users/rishinkumar/Documents/College /02 Business Analytics/Final Project/report/cafe_report.tex" "cafe_report.pdf" "cafe_report" 1795296321.24162 0
+["pdflatex"] 1795384828.6712 "/Users/rishinkumar/Documents/College /02 Business Analytics/Final Project/report/cafe_report.tex" "cafe_report.pdf" "cafe_report" 1795384829.59994 0
   "/Users/rishinkumar/Documents/College /02 Business Analytics/Final Project/report/cafe_report.tex" 1795296240.67534 32873 052598bbd95252bb0f3909845291c260 ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
@@ -122,8 +122,8 @@
   "/usr/local/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1788096714 5573038 b99aad5e4898a9034e953632f940512b ""
   "/usr/local/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1774209607 3636776 dc5fa9b6b1453b9d196cd42edf876004 ""
   "/usr/local/texlive/2026/texmf.cnf" 1774209515 577 648cd9f92f9c0eac486f4c71c85cfbbe ""
-  "cafe_report.aux" 1795296321.15853 20562 acc732439a1b3f7595f4064e09f7ebfd "pdflatex"
-  "cafe_report.out" 1795296321.16059 3182 3ff9c9272cb5b3e2cda9963a7e14766c "pdflatex"
+  "cafe_report.aux" 1795384829.51114 20562 acc732439a1b3f7595f4064e09f7ebfd "pdflatex"
+  "cafe_report.out" 1795384829.51297 3182 3ff9c9272cb5b3e2cda9963a7e14766c "pdflatex"
   "cafe_report.tex" 1795296240.67534 32873 052598bbd95252bb0f3909845291c260 ""
   "cafestyle.sty" 1795295405.04522 2548 f9b0ddf196b984560f6b96f3b005867c ""
   "figures/A10_figure.pdf" 1795295965.66073 18674 7a1469edb9fc2751bff9d10ef1f88386 ""
@@ -157,7 +157,7 @@
   "tables/A7_table.tex" 1795295965.00891 501 f9424761147ee446db9004723590ecdf ""
   "tables/A8_table.tex" 1795295965.17993 668 e8386973d561fe20f84d36fe73bc0fad ""
   "tables/A9_table.tex" 1795295965.41011 691 7099e2afff662870923bf881c138190b ""
-  "tables/cleaning_log.tex" 1795295957.77869 938 acbbd7d1ec0298f24acfb48e25e09032 ""
+  "tables/cleaning_log.tex" 1795384828.33307 938 e9647feb1479328aeefb534f65c50f2b ""
   "tables/descriptives.tex" 1795295958.29315 697 cbe498d3b457805be51e5414ad837da8 ""
   "tables/descriptives_cat.tex" 1795295958.30073 683 7287978568584e46af1c3c3d4fdfaa5d ""
   "tables/descriptives_groups.tex" 1795295958.31145 1107 b13362db77dedf6e13e3b246bd853687 ""
